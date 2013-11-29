@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>DipFoodLog</title>
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<script src="js/jquery-1.10.2.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+		.dfl-left,
+		.dfl-right {
+			background: #000;
+		}
+
+		body {
+			font-family: Arial, Verdana;
+		}
+
+		.dfl-logo {
+			width: 26px;
+			height: 26px;
+			margin-left: 20px;
+			margin-top: -10px;
+		}
+
+		#dfl_title {
+			font-size: 22px;
+			margin-left: 6px;
+		}
+
+		#txtSearch {
+			margin-left: 16px;
+		}
+
+		#drpCategory {
+			float: right;
+		}
+
+		#dfl_footer {
+			position: fixed;
+			z-index: 10;
+			bottom: 0px;
+		}
+
+		.dfl-header {
+			background: #141414;
+			color: #fff;
+			height: 40px;
+			padding-top: 5px;
+			position: fixed;
+			top: 0px;
+			z-index: 10;
+			width: 100%;
+		}
+		.dfl_searchbar {
+			min-height: 40px;
+			padding-top: 6px;
+		}
+
+		#drpCategory {
+			margin-right: 15px;
+		}
+		#dfl_selected_category {
+			color: #fff;
+		}
+		#ul_category li {
+			color: #000;
+		}
+		.visible {
+			display: block;
+		}
+		.dfl-result-image img {
+			margin-left: 30px;
+		}
+
+		.dfl-result-title {
+			padding-left: 32px;
+			font-weight: bold;
+		}
+
+		.dfl-excerpt {
+			padding-left: 32px;
+			padding-right: 20px;
+			font-style: italic;
+		}
+		.dfl-result {
+			padding: 10px 1px;
+			border: 1px solid #b3b3b3;
+			background: #eee;
+			color: #3e3e3e;
+			text-shadow: 0 1px 0 #fff;
+			background-image: -webkit-gradient(linear,left top,left bottom,from(#f0f0f0),to(#ddd));
+			background-image: -webkit-linear-gradient(#f0f0f0,#ddd);
+			background-image: -moz-linear-gradient(#f0f0f0,#ddd);
+			background-image: -ms-linear-gradient(#f0f0f0,#ddd);
+			background-image: -o-linear-gradient(#f0f0f0,#ddd);
+			background-image: linear-gradient(#f0f0f0,#ddd);
+		}
+
+		.dfl-button-footer.active,
+		.dfl-button-footer:hover {
+			background-color: #DD4814;
+			border-color: #DD4814;
+			
+		}
+
+		.dfl-button-footer {
+			background-color: #DF7C5A;
+			border-color: #DF7C5A;
+		}
+	</style>
+
+	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=true"></script>
+</head>
+<body>
+	<div class="dfl-header">
+		
+		<img src="img/logo.jpg" class="dfl-logo"/> 
+		<span id="dfl_title">DipFoodLog</span>
+		<div style="clear: both;"></div>
+
+		<div class="navbar navbar-default row dfl_searchbar">
+			<div class="col-xs-6">
+				<input id="txtSearch" type="text" class="" placeholder="Search">
+			</div>
+			<div class="col-xs-6">
+				<div id="drpCategory" class="dropdown">
+		          <a id="dfl_selected_category" class="dropdown-toggle" data-toggle="dropdown" href="#">
+		            <span class="dfl_category_name">Select Category</span> <span class="caret"></span>
+		          </a>
+		          <ul id="ul_category" class="dropdown-menu pull-right">
+		          	<li><a href="#" value="">Select Category</a></li>
+		          	<li class="divider"></li>
+		          </ul>
+		        </div>
+			</div>		
+		</div>
+	</div>
+	<div style="clear: both;"></div>
+	<div id="dfl_header_spacer" style="height: 76px; background: #444" >&nbsp; </div>
+	
+	<div id="dfl_results_food" class="row dfl_results" loaded="0" style="display:none;">
+	</div>
+	<div id="dfl_results_restaurant" class="row dfl_results" loaded="0" style="display:none;">
+	</div>
+
+	<div id="dfl_footer_spacer" style="height: 38px; /*background: #444*/" >&nbsp; </div>
+	<div id="dfl_footer">
+		<div class="row">
+			<div class="btn-group btn-group-justified">
+				<a id="aFoodItems" class="btn btn-default dfl-button-footer" role="button">Food Items</a>
+				<a id="aRestaurants" class="btn btn-default dfl-button-footer" role="button">Restaurants</a>
+			</div>
+		</div>
+	</div>
+
+	<div id="dfl_templates" class="row" style="display:none;">
+		<div class="row dfl-result">
+			<div class="col-xs-2 dfl-result-image"></div>
+			<div class="col-xs-10">
+				<div class="dfl-result-title">{title}</div>
+				<div class="dfl-excerpt">{excerpt}</div>
+			</div>
+		</div>
+		<ul class="dfl-category">
+			<li><a href="#">{category}</a></li>
+		</ul>
+	</div>
+
+	<div class="modal fade" id="dfl_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="myModalLabel">{Title}</h4>
+	      </div>
+	      <div class="modal-body">
+	      	<div class="row">
+		      	<div class="col-xs-4 dfl-detail-image"></div>
+				<div class="col-xs-8">
+					<span class="dfl-detail-title">{title}</span>
+					<br />
+					<span class="dfl-detail-description">{description}</span>
+		      	</div>
+		    </div>
+	      	<div style="clear: both;">&nbsp;</div>
+
+	      	<div id="dfl_detail_map" style="display: none; widht: 450px; height: 300px;">{map}</div>
+	      </div>
+	      <div class="modal-footer">
+	      	<div class="fb-share-button" data-href="http://dipfoodlog.technolojet.com" data-width="300" data-type="button_count"></div>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<script type="text/javascript">
+		jQuery(function($) {
+			var map;
+
+			var dfl_modal = $("#dfl_modal").modal({show: false});
+			$('#dfl_modal').on('shown.bs.modal', function () {
+				var results_container = $(".dfl-visible");
+		    	var is_food_search = $(results_container).attr("id") == "dfl_results_food";
+
+		    	if(!is_food_search) {
+					google.maps.event.trigger(map, "resize");
+				}
+			});
+
+			function reloadMap(latitude, longitude) {
+		    	var center = new google.maps.LatLng(latitude, longitude);
+		    	var marker = new google.maps.Marker({
+					position: center
+				});
+
+				var mapOptions = {
+			        center: center,
+			        zoom: 16,
+			        mapTypeId: google.maps.MapTypeId.ROADMAP
+			    };
+
+				map = new google.maps.Map(document.getElementById("dfl_detail_map"), mapOptions);
+				map.panTo(center);
+
+				marker.setMap(map);
+		    }
+
+			var selected_category_id = "";
+
+			var base_url = "//dipfoodlog.technolojet.com/";
+			var api_url = base_url + "api/";
+			var uploads_url = base_url + "wp-content/uploads/";
+
+			var food_items = new Array();
+			var images = new Array();
+			var restaurants = new Array();
+			var categories = new Array();
+
+			function setTitle(title) {
+				$("#dfl_title").html(title);
+			}
+
+			function displayResults(element, items) {
+				var is_loaded = $(element).attr("loaded");
+
+				if(is_loaded !== undefined && is_loaded == "0") {
+
+					$(items).each(function(){
+		        		var row = $("#dfl_templates .dfl-result").clone();
+		        		var item_id = this.ID;
+
+		        		var item_images = $.grep(images, function(el) {
+								return el.parent_id == item_id;
+							});
+
+		        		var image_url = "img/image-unavailable.jpg";
+		        		if(item_images.length > 0) {
+		        			var item_thumb = item_images[0].thumbnails;
+		        			image_url = uploads_url + item_thumb["img_directory"] +  item_thumb["sizes"]["thumbnail"].file;
+		        		}
+
+		        		$(row).find(".dfl-result-image").append(
+		        				$("<img>").attr({
+		        					"src": image_url,
+		        					"width": "60px"
+		        				})
+		        			);
+		        		$(row).find(".dfl-result-title").html(this.post_title);
+		        		$(row).find(".dfl-excerpt").html(this.excerpt);
+		        		$(row).attr("title", this.post_title.toLowerCase());
+		        		$(row).attr("item-id", this.ID);
+
+		        		$(this.category_ids).each(function(){
+		        			$(row).addClass("cat-" + this);
+		        		});
+
+		        		$(element).append(row);
+		        	});
+		        	$(element).attr("loaded", items.length);
+				}
+
+				$(".dfl_results").removeClass("dfl-visible").hide();
+				$(element).addClass("dfl-visible").show();
+
+				showFilteredResults();
+			}
+
+			function displayFoodItems() {
+				displayResults($("#dfl_results_food"), food_items);
+				setTitle("Food Search");
+				$("#drpCategory").show();
+			}
+
+			function displayRestaurants() {
+				displayResults($("#dfl_results_restaurant"), restaurants);
+				setTitle("Restaurant Search");
+				$(drpCategory).hide();
+			}
+
+			function displayCategories(parent_id, level) {
+				$(categories).each(function (){
+					if(this.parent == parent_id) {
+						var category = $("#dfl_templates .dfl-category li").clone();
+						var hyphen = new Array(level + 1).join("-");
+
+						category.find("a")
+							.attr("value", this.term_id)
+							.html(hyphen + " " + this.name);
+
+						$("#ul_category").append(category);
+						displayCategories(this.term_id, level + 1);
+					}
+				});
+			}
+
+			function showFilteredResults() {
+				var keyword = $("#txtSearch").val();
+				keyword = (keyword != undefined) ? keyword.toLowerCase() : "";
+
+				var results_container = $(".dfl-visible");
+				$(results_container).children(".dfl-result").hide();
+				$(".dfl-button-footer").removeClass("active");	
+
+				var is_food_search = $(results_container).attr("id") == "dfl_results_food";
+				if(is_food_search) {
+					if(keyword == "" && selected_category_id == "") {
+						$(results_container).children(".dfl-result").show();
+					} else if(selected_category_id != "") {
+						var keyword_selector = (keyword != "") ?  "[title*='" + keyword +  "']" : "";
+						$(results_container).find(".cat-" + selected_category_id + keyword_selector).show();
+					} else {
+						$(results_container).find("[title*='" + keyword +  "']").show();
+					}
+
+					$("#aFoodItems").addClass("active");
+				} else {
+					if(keyword == "") {
+						$(results_container).children(".dfl-result").show();
+					} else {
+						$(results_container).find("[title*='" + keyword +  "']").show();
+					}
+
+					$("#aRestaurants").addClass("active");
+				}    	
+			}
+
+		    function getCategories() {
+		    	$.ajax({
+			        type: "GET",
+			        url: api_url + "categories/",
+			        dataType: "json",
+			        success: function(categs) {
+			        	categories = categs;
+			        	displayCategories(0, 0);
+			        }
+			    });
+		    }
+
+			function getImages(callback){
+				$.ajax({
+			        type: "GET",
+			        url: api_url + "images/",
+			        dataType: "json",
+			        success: function(imgs) {
+			        	images = imgs;
+
+			        	callback();
+			        }
+			    });
+			}
+
+		    function getFoodItems(){
+		    	if(food_items.length == 0) {
+		    		$.ajax({
+				        type: "GET",
+				        url: api_url + "food-items/",
+				        dataType: "json",
+				        success: function(foods) {
+				        	food_items = foods;
+
+				        	if(images.length == 0) {
+				        		getImages(displayFoodItems);
+				        	} else {
+				        		displayFoodItems();
+				        	}
+				        }
+				    });
+		    	} else {
+		    		displayFoodItems();
+		    	}
+		    }
+
+		    function getRestaurants(){
+		    	if(restaurants.length == 0) {
+		    		$.ajax({
+				        type: "GET",
+				        url: api_url + "restaurants/",
+				        dataType: "json",
+				        success: function(restos) {
+				        	restaurants = restos;
+
+				        	if(images.length == 0) {
+				        		getImages(displayRestaurants);
+				        	} else {
+				        		displayRestaurants();
+				        	}
+				        }
+				    });
+		    	} else {
+		    		displayRestaurants();
+		    	}
+		    }
+
+		    $("#aFoodItems").click(function(){
+		    	getFoodItems();
+		    });
+
+		    $("#aRestaurants").click(function() {
+		    	getRestaurants();
+		    });
+
+		    $("#txtSearch").change(function(){
+		    	showFilteredResults();
+		    });
+
+		    $("#ul_category").on("click", "a", function(){
+		    	selected_category_id = $(this).attr("value");
+		    	$("#dfl_selected_category .dfl_category_name").html($(this).html());
+		    	showFilteredResults();
+		    });
+
+		    $(".dfl_results").on("click", ".dfl-result", function(){
+		    	var results_container = $(".dfl-visible");
+		    	var is_food_search = $(results_container).attr("id") == "dfl_results_food";
+
+		    	if(is_food_search) {
+		    		var food_id = $(this).attr("item-id");
+		    		var food_item = $.grep(food_items, function (a) {
+		    			return a.ID == food_id;
+		    		});
+
+		    		if(food_item.length > 0) {
+		    			food_item = food_item[0];
+
+		    			var food_images = $.grep(images, function(a) {
+		    				return a.parent_id == food_id;
+		    			});
+
+		    			for(var i = 0; i < food_images.length; i++) {
+		    				var item_thumb = food_images[i].thumbnails;
+		    				image_url = uploads_url + item_thumb["img_directory"] +  item_thumb["sizes"]["medium"].file;
+		    				$("#dfl_modal .dfl-detail-image").empty().append($("<img>").attr({
+		    					"src": image_url,
+		    					"width": "100%"
+		    				}));
+		    			}
+
+		    			$("#dfl_modal .modal-title").html("Food Item Details");
+		    			$("#dfl_modal .dfl-detail-title").html(food_item.post_title);
+		    			$("#dfl_modal .dfl-detail-description").html(food_item.post_content);
+
+		    			$("#dfl_detail_map").hide();
+
+		    			dfl_modal.modal('show');
+		    			
+		    		} else {
+		    			alert("There is an error; We'll fix this first thing tomorrow");
+		    		}
+		    	} else {
+		    		var resto_id = $(this).attr("item-id");
+		    		var resto_item = $.grep(restaurants, function (a) {
+		    			return a.ID == resto_id;
+		    		});
+
+		    		if(resto_item.length > 0){
+		    			resto_item = resto_item[0];
+
+		    			var resto_images = $.grep(images, function(a) {
+		    				return a.parent_id == resto_id;
+		    			});
+
+		    			for(var i = 0; i < resto_images.length; i++) {
+		    				var item_thumb = resto_images[i].thumbnails;
+		    				image_url = uploads_url + item_thumb["img_directory"] +  item_thumb["sizes"]["medium"].file;
+		    				$("#dfl_modal .dfl-detail-image").empty().append($("<img>").attr({
+		    					"src": image_url,
+		    					"width": "100%"
+		    				}));
+		    			}
+
+		    			var location = resto_item.location;
+		    			var location_segments = location.split("|");
+		    			var location_place = location_segments[0];
+		    			var location_coords = location_segments[1];
+		    			var location_coords_segments = location_coords.split(",");
+		    			var latitude = location_coords_segments[0];
+		    			var longitude = location_coords_segments[1];
+
+		    			$("#dfl_modal .modal-title").html("Restaurant Details");
+		    			$("#dfl_modal .dfl-detail-title").html(resto_item.post_title);
+		    			$("#dfl_modal .dfl-detail-description").html(resto_item.post_content);
+
+		    			$("#dfl_detail_map").empty();
+		    			reloadMap(latitude, longitude);
+		    			$("#dfl_detail_map").show();
+
+		    			dfl_modal.modal('show');
+		    		} else {
+		    			alert("There is an error; We'll fix this first thing tomorrow");
+		    		}
+		    	}		    	
+		    });
+
+		    getFoodItems();
+		    getCategories();
+		});
+	</script>
+</body>
+</html>
