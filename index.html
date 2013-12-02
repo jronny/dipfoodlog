@@ -244,14 +244,14 @@
 
     <script type="text/javascript">
 
-      // function showAlert(title, message) {
-      //     navigator.notification.alert(
-      //         message,  // message
-      //         function() {},         // callback
-      //         title,            // title
-      //         'Done'                  // buttonName
-      //     );
-      // }
+      function showAlert(title, message) {
+          navigator.notification.alert(
+              message,  // message
+              function() {},         // callback
+              title,            // title
+              'Done'                  // buttonName
+          );
+      }
 
       var base_url = "http://dipfoodlog.technolojet.com/";
       var api_url = base_url + "api/";
@@ -297,7 +297,7 @@
               }
             );
         };
-        //setLocation();
+        setLocation();
 
         function reloadMap(latitude, longitude) {
           //every time the map is reloaded, the location should be retrieved 
