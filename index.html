@@ -236,7 +236,7 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="phonegap.js"></script>
+    <!-- <script src="phonegap.js"></script> -->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
@@ -354,6 +354,7 @@
               url: api_url + name + "/",
               dataType: "json",
               success: function(items) {
+                alert("name");
                 callback(items);
               },
               error: function() {
@@ -643,7 +644,7 @@
             
             $("#dfl_mod_resto").modal("show");
           } else {
-            alert("Restaurant not found!");
+            console.log("Restaurant not found!");
           }
         }
         /* end */
