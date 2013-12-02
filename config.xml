@@ -17,6 +17,9 @@
         Jronny Amarante
     </author>
 
+    <access origin="*"/>
+    <content src="index.html" />
+
     <gap:platform name="ios" />
     <gap:platform name="android" />
     <gap:platform name="webos" />
@@ -29,6 +32,8 @@
     <preference name="android-maxSdkVersion" value="15" />
     <preference name="android-targetSdkVersion" value="12" />
     <preference name="android-installLocation" value="auto" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
     
     <icon src="icon.png" />
 </widget>
