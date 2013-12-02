@@ -349,12 +349,13 @@
         /* End */
 
         function getItems(name, callback) {
+          alert("getting " + name);
           $.ajax({
               type: "GET",
               url: api_url + name + "/",
               dataType: "json",
               success: function(items) {
-                alert("name");
+                alert(name);
                 callback(items);
               },
               error: function() {
