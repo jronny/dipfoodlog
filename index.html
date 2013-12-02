@@ -236,7 +236,7 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="phonegap.js"></script>
+    <!-- <script src="phonegap.js"></script>-->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
@@ -244,20 +244,24 @@
 
     <script type="text/javascript">
 
-      function showAlert(title, message) {
-          navigator.notification.alert(
-              message,  // message
-              function() {},         // callback
-              title,            // title
-              'Done'                  // buttonName
-          );
-      }
+      // function showAlert(title, message) {
+      //     navigator.notification.alert(
+      //         message,  // message
+      //         function() {},         // callback
+      //         title,            // title
+      //         'Done'                  // buttonName
+      //     );
+      // }
 
       var base_url = "http://dipfoodlog.technolojet.com/";
       var api_url = base_url + "api/";
       var uploads_url = base_url + "wp-content/uploads/";
 
       jQuery(function(){
+        $(document).bind("mobileinit", function () {
+            $.support.cors = true;
+            $.mobile.allowCrossDomainPages = true;
+        });
 
         var food_items;
         var restaurants;
@@ -341,7 +345,7 @@
                         current_location = destination;
                         marker.setMap(map);
 
-                        console.log("Directions was not successful for the following reason: " + status);
+                        //console.log("Directions was not successful for the following reason: " + status);
                       }
                   });
 
@@ -350,7 +354,7 @@
                 current_location = destination;
                 marker.setMap(map);
 
-                console.log("Geocode was not successful for the following reason: " + status);
+                //console.log("Geocode was not successful for the following reason: " + status);
               }
           });
 
@@ -358,13 +362,13 @@
         /* End */
 
         function getItems(name, callback) {
-          showAlert("getting " + name);
+          //showAlert("getting " + name);
           $.ajax({
               type: "GET",
               url: api_url + name + "/",
               dataType: "json",
               success: function(items) {
-                showAlert(name);
+            //    showAlert(name);
                 callback(items);
               },
               error: function() {
@@ -654,7 +658,7 @@
             
             $("#dfl_mod_resto").modal("show");
           } else {
-            console.log("Restaurant not found!");
+            //console.log("Restaurant not found!");
           }
         }
         /* end */
