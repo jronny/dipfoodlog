@@ -50,6 +50,7 @@
         right: 0;  
         margin: auto;  
         background: #3A6F9A; 
+        height: 100%;
       }
 
       .dfl-food-items {
@@ -235,13 +236,15 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="phonegap.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
-    <!-- <script src="docs-assets/js/holder.js"></script> -->
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=true"></script>
 
     <script type="text/javascript">
+
+
       var base_url = "http://dipfoodlog.technolojet.com/";
       var api_url = base_url + "api/";
       var uploads_url = base_url + "wp-content/uploads/";
@@ -254,13 +257,18 @@
 
         var selected_category_id = "";
 
+        /**
+         * Region
+         * triggers: Display Modal
+         */
         var map;
         var map_center;
         $('#dfl_mod_resto').on('shown.bs.modal', function () {
           google.maps.event.trigger(map, "resize");
-          map.panTo(map_center);
 
-          console.log(map_center);
+          //this has to be re-panned as the map inside the modal is not accurate when invisible
+          //only triggered when the map is shown
+          map.panTo(map_center);
         });
         function reloadMap(latitude, longitude) {
           var center = new google.maps.LatLng(latitude, longitude);
@@ -279,6 +287,7 @@
 
           marker.setMap(map);
         }
+        /* End */
 
         function getItems(name, callback) {
           $.ajax({
@@ -424,7 +433,6 @@
               && images != null 
               && categories != null) {
             
-            //alert("loaded na tanan!");
             paintCategoryDropdown();
             paintFoodItemResults();
             paintRestaurantResults();
@@ -434,10 +442,6 @@
             $(window).unbind("resize");
           }
         }
-
-        // function generateTitle(){
-
-        // }
 
         function showFilteredResults() {
           var keyword = $("#dfl_txt_search").val();
@@ -451,23 +455,6 @@
           } else {
             $(".dfl-div-results" + keyword_selector).show();
           }
-
-          // var title = "DipFoodLog";
-          // // if($("#dfl_a_food").parent().hasClass("active")) {
-          // if(is_food)
-          //   title = "Food Search";
-          // } else {
-          //   title = "Restaurant Search";
-          // }
-
-          // var keyword = $("#dfl_txt_search").val();
-          // keyword = (keyword != undefined) ? keyword.toLowerCase() : "";
-          // if(keyword != "") {
-          //   title += ": '" + keyword + "'";
-          // }
-
-          // $("#dfl_main_title").html(title);
-
         }
 
         $(".modal").on('shown.bs.modal', function () {
@@ -593,6 +580,10 @@
           }
         }
 
+        /**
+         * Region
+         * triggers: Display Modal
+         */
         $("#dfl_results_food").on("click", ".list-group-item", function(){
           var food_id = $(this).attr("dfl-id");
           showFoodDetails(food_id);
@@ -610,18 +601,27 @@
           var food_id = $(this).attr("dfl-id");
           showFoodDetails(food_id);
         });
+        /* End */
 
+        /**
+         * Region
+         * event: change in search parameters
+         */
         $("#dfl_categories").on("click", "li.dfl-li-category", function(){
           selected_category_id = $(this).attr("dfl-id");
           $("#dfl_selected_category span").html($(this).attr("dfl-name"));
 
           showFilteredResults();
         });
-
         $("#dfl_txt_search").change(function(){
           showFilteredResults();
         });
+        /* End */
 
+        /**
+         * Region
+         * event: Tab Change (additional)
+         */
         $("#dfl_a_food").click(function() {
           showFilteredResults();
           $("#dfl_selected_category").show();
@@ -629,8 +629,13 @@
         $("#dfl_a_resto").click(function(){
           showFilteredResults();
           $("#dfl_selected_category").hide();
-        })
+        });
+        /* End */
 
+        /**
+         * Region
+         * Initialization
+         */
         function showLoadingPanel() {
           $("#dfl_loading").css({
             "height": $(window).height() + "px"
@@ -640,6 +645,7 @@
             "max-width" : ($(window).width() * .9) + "px",
           })
         }
+
         $(window).resize(function() {
           showLoadingPanel();
         });
@@ -663,7 +669,8 @@
         getItems("images", function(imgs) {
           images = imgs;
           paintItems();
-        });        
+        });
+        /* End Initialization */
       })
     </script>
   </body>
