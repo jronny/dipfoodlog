@@ -236,13 +236,22 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <!-- <script src="phonegap.js"></script> -->
+    <script src="phonegap.js"></script>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=true"></script>
 
     <script type="text/javascript">
+
+      function showAlert(title, message) {
+          navigator.notification.alert(
+              message,  // message
+              function() {},         // callback
+              title,            // title
+              'Done'                  // buttonName
+          );
+      }
 
       var base_url = "http://dipfoodlog.technolojet.com/";
       var api_url = base_url + "api/";
@@ -349,13 +358,13 @@
         /* End */
 
         function getItems(name, callback) {
-          alert("getting " + name);
+          showAlert("getting " + name);
           $.ajax({
               type: "GET",
               url: api_url + name + "/",
               dataType: "json",
               success: function(items) {
-                alert(name);
+                showAlert(name);
                 callback(items);
               },
               error: function() {
