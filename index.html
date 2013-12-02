@@ -55,6 +55,21 @@
       .dfl-food-items {
         margin-bottom: 8px;
       }
+
+      .modal-title {
+        
+        font-weight: bold;
+      }
+
+      .modal-title,
+      .dfl-food-title,
+      .dfl-resto-title {
+        color: #000;
+      }
+
+      .text-muted {
+        color: #fff;
+      }
     </style>
   </head>
 
@@ -227,7 +242,7 @@
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=true"></script>
 
     <script type="text/javascript">
-      var base_url = "//dipfoodlog.technolojet.com/";
+      var base_url = "http://dipfoodlog.technolojet.com/";
       var api_url = base_url + "api/";
       var uploads_url = base_url + "wp-content/uploads/";
 
@@ -420,6 +435,10 @@
           }
         }
 
+        // function generateTitle(){
+
+        // }
+
         function showFilteredResults() {
           var keyword = $("#dfl_txt_search").val();
           keyword = (keyword != undefined) ? keyword.toLowerCase() : "";
@@ -432,6 +451,23 @@
           } else {
             $(".dfl-div-results" + keyword_selector).show();
           }
+
+          // var title = "DipFoodLog";
+          // // if($("#dfl_a_food").parent().hasClass("active")) {
+          // if(is_food)
+          //   title = "Food Search";
+          // } else {
+          //   title = "Restaurant Search";
+          // }
+
+          // var keyword = $("#dfl_txt_search").val();
+          // keyword = (keyword != undefined) ? keyword.toLowerCase() : "";
+          // if(keyword != "") {
+          //   title += ": '" + keyword + "'";
+          // }
+
+          // $("#dfl_main_title").html(title);
+
         }
 
         $(".modal").on('shown.bs.modal', function () {
@@ -586,12 +622,12 @@
           showFilteredResults();
         });
 
-        $("#dfl_a_food").click(function(){
-          $("#dfl_main_title").html("Food Search");
+        $("#dfl_a_food").click(function() {
+          showFilteredResults();
           $("#dfl_selected_category").show();
         });
         $("#dfl_a_resto").click(function(){
-          $("#dfl_main_title").html("Restaurant Search");
+          showFilteredResults();
           $("#dfl_selected_category").hide();
         })
 
