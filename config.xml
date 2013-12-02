@@ -18,16 +18,16 @@
  under the License.
 -->
 <widget xmlns     = "http://www.w3.org/ns/widgets"
-        id        = "io.cordova.helloCordova"
-        version   = "2.0.0">
-    <name>Hello Cordova</name>
+        id        = "org.technolojet.dfl"
+        version   = "1.0.0">
+    <name>DipFoodLog</name>
 
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Dipolog's Food Directory
     </description>
 
-    <author href="http://cordova.io" email="dev@cordova.apache.org">
-        Apache Cordova Team
+    <author href="http://technolojet.com" email="jamarante@technolojet.com">
+        Jronny Amarante
     </author>
 
     <access origin="*"/>
