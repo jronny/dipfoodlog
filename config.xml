@@ -20,15 +20,14 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         id        = "io.cordova.helloCordova"
         version   = "2.0.0">
-        
-    <name>DipFoodLog</name>
+    <name>Hello Cordova</name>
 
     <description>
-        Dipolog's Food Directory
+        A sample Apache Cordova application that responds to the deviceready event.
     </description>
 
-    <author href="http://cordova.io" email="jamarante@technolojet.com">
-        Jronny Amarante
+    <author href="http://cordova.io" email="dev@cordova.apache.org">
+        Apache Cordova Team
     </author>
 
     <access origin="*"/>
