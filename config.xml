@@ -20,7 +20,10 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         id        = "org.technolojet.dfl"
         version   = "1.0.0">
-    <name>DipFoodLog</name>
+    
+    <name>
+      DipFoodLog
+    </name>
 
     <description>
         Dipolog's Food Directory
@@ -29,7 +32,7 @@
     <author href="http://technolojet.com" email="jamarante@technolojet.com">
         Jronny Amarante
     </author>
-
+    
     <access origin="*"/>
 
     <!-- <content src="http://mysite.com/myapp.html" /> for external pages -->
@@ -49,7 +52,7 @@
       <param name="android-package" value="org.apache.cordova.App"/>
     </feature>
     <feature name="Geolocation">
-      <param name="android-package" value="org.apache.cordova.GeoBroker"/>
+      <param name="android-package" value="org.apache.cordova.geolocation.GeoBroker" />
     </feature>
     <feature name="Device">
       <param name="android-package" value="org.apache.cordova.Device"/>

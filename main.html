@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DipFoodLog - Dipolog's Food Directory</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-united.min.css" rel="stylesheet">
+    <link href="css/dipfoodlog.css" rel="stylesheet">
+
+    <style type="text/css">
+      #dfl_txt_search {
+        margin-left: 14px;
+      }
+
+      #dfl_resto_map {
+        height: 200px;
+        margin-left: 0;
+      }
+      #dfl_templates {
+        display: none;
+      }
+
+      #dfl_loading {
+        position: fixed;
+        background: #FE5B01;
+        width: 100%;
+        height: 100%;
+        z-index: 2000;
+        top: 0;
+      }
+
+      #dfl_img_loading {
+        position: absolute;  
+        top: 0;  
+        bottom: 0;  
+        left: 0;  
+        right: 0;  
+        margin: auto;  
+        background: #3A6F9A; 
+        height: 90%;
+      }
+
+      .dfl-food-items {
+        margin-bottom: 8px;
+      }
+
+      .modal-title {        
+        font-weight: bold;
+      }
+
+      .modal-title,
+      .dfl-food-title,
+      .dfl-resto-title {
+        color: #000;
+      }
+
+      .text-muted {
+        color: #fff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="dfl_loading" class="container">
+      <img id="dfl_img_loading" src="img/splash.jpg" />
+    </div>
+
+    <div id="dfl_templates">
+      <ul id="dfl_drp_categ">
+        <li class="dfl-li-category" dfl-name="{name}" dfl-id="{id}">
+          <a href="#">{Category Name}</a>
+        </li>
+      </ul>
+
+      <div class="row list-group-item dfl-div-results" dfl-name="{name}" dfl-id="{id}">
+        <div class="clearfix visible-xs"></div>
+        <div class="col-xs-2">
+          <img class="img-thumbnail" src="img/image-unavailable.jpg" />
+        </div>
+        <div class="col-xs-10">
+           <h4 class="list-group-item-heading">{Food Name}</h4>
+           <p class="list-group-item-text">{Food Description}</p>
+        </div>
+      </div>
+
+      <button data-dismiss="modal" class="btn btn-default dfl-btn-food" type="button">{Food Name}</button>
+
+      <ul>
+        <li class="dfl-image list-group-item">
+          <img src="img/image-unavailable.jpg" width="100%" />
+        </li>
+      </ul>
+    </div>
+
+    <div class="tab-content">
+      <div id="dfl_results_food" class="container tab-pane active">
+
+      </div>
+      <div id="dfl_results_resto" class="container tab-pane">
+
+      </div>
+    </div>
+
+    <div class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+      <div class="container tabs-bottom">
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a id="dfl_a_food" class="text-muted" href="#dfl_results_food" data-toggle="tab">Food Items</a>
+          </li>
+          <li>
+            <a id="dfl_a_resto" class="text-muted" href="#dfl_results_resto" data-toggle="tab">Restaurants</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a id="dfl_main_title" class="navbar-brand" href="#">Food Search</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">   
+            <li> 
+              <div class="navbar-form">
+                  <input id="dfl_txt_search" type="text" placeholder="Search" class="form-control">
+              </div>
+            </li>        
+            <li class="dropdown">
+              <a id="dfl_selected_category" href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <span> Choose Category </span>
+                <b class="caret"></b>
+              </a>
+              
+              <ul id="dfl_categories" class="dropdown-menu">
+                <li class="dfl-li-category" dfl-id="" dfl-name="Choose Category"><a href="#">No Category Selected</a></li>
+                <li class="divider"></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="dfl_mod_food" role="dialog" aria-labelledby="modal_food_label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="modal_food_label">{Title}</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-xs-4 dfl-detail-image">
+                <ul class="dfl-detail-image-list list-group">
+                </ul>
+              </div>
+              <div class="col-xs-8">
+                <h4 class="dfl-food-title">{Food Name}</h4>
+                <i class="dfl-food-description">{Food Description}</i>
+              </div>
+            </div>
+            
+            <div class="row col-xs-12">
+              <h4> 
+                Served by: <button type="button" class="btn btn-default dfl-btn-resto" data-dismiss="modal">Restaurant Name</button>
+              </h4>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <div class="fb-share-button" data-href="http://dipfoodlog.technolojet.com" data-width="300" data-type="button_count"></div>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="dfl_mod_resto" role="dialog" aria-labelledby="modal_resto_label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="modal_resto_label">{Title}</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-xs-4 dfl-detail-image">
+                <ul class="dfl-detail-image-list list-group">
+                </ul>
+              </div>
+              <div class="col-xs-8">
+                <h4 class="dfl-resto-title">{Restaurant Name}</h4>
+                <i class="dfl-resto-description">{Restaurant Description}</i>
+              </div>
+            </div>
+            
+            <div class="row col-xs-12 dfl-food-items">
+              <h4> 
+                Also Serves: 
+              </h4>
+            </div>
+
+            <div id="dfl_resto_map" class="row col-xs-12">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="fb-share-button" data-href="http://dipfoodlog.technolojet.com" data-width="300" data-type="button_count"></div>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="phonegap.js"></script>
+    <script src="js/jquery-2.0.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDY0kkJiTPVd2U7aTOAwhc9ySH6oHxOIYM&sensor=true"></script>
+
+    <script type="text/javascript">
+
+      function showAlert(title, message) {
+          navigator.notification.alert(
+              message,  // message
+              function() {},         // callback
+              title,            // title
+              'Done'                  // buttonName
+          );
+      }
+
+      var base_url = "http://dipfoodlog.technolojet.com/";
+      var api_url = base_url + "api/";
+      var uploads_url = base_url + "wp-content/uploads/";
+
+      jQuery(function(){
+        $(document).bind("mobileinit", function () {
+            $.support.cors = true;
+            $.mobile.allowCrossDomainPages = true;
+        });
+
+        var food_items;
+        var restaurants;
+        var images;
+        var categories;
+
+        var selected_category_id = "";
+
+        var map;
+        var directionsService;
+
+        /**
+         * Region
+         * triggers: Display Modal
+         */
+        var current_location;
+        $('#dfl_mod_resto').on('shown.bs.modal', function () {
+          google.maps.event.trigger(map, "resize");
+
+          //this has to be re-panned as the map inside the modal is not accurate when not yet rendered
+          //only triggered when the map is shown
+          map.panTo(current_location);
+          map.setZoom(16);
+        });
+
+        function showMapDirections(destination) {
+          navigator.geolocation.getCurrentPosition(
+            function(position) {
+              origin = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+              directionsService = new google.maps.DirectionsService();
+              directionsDisplay = new google.maps.DirectionsRenderer();
+              directionsDisplay.setMap(map);
+
+              var geocoder = new google.maps.Geocoder(map);
+              var geocodeParams = { 
+                'location': destination
+              };
+              geocoder.geocode(geocodeParams, function(results, status) {
+                  if (status == google.maps.GeocoderStatus.OK) {
+                    var request = {
+                      origin: origin,
+                      destination: destination,
+                      travelMode: google.maps.DirectionsTravelMode.DRIVING
+                    };
+
+                    directionsService.route(request, function(result, status) {
+                      if (status == google.maps.DirectionsStatus.OK) {
+                          directionsDisplay.setDirections(result);
+                      }
+                    });
+                  }
+              });
+            }, function() {
+              //Preferably show a message that says about this error and what to do with it
+            }
+          );
+        }
+
+        function reloadMap(latitude, longitude) {
+          var destination = new google.maps.LatLng(latitude, longitude);
+          current_location = destination;
+
+          var marker = new google.maps.Marker({
+            position: destination
+          });
+
+          var mapOptions = {
+                center: destination,
+                zoom: 16,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+          map = new google.maps.Map(document.getElementById("dfl_resto_map"), mapOptions);
+          marker.setMap(map);
+
+          //every time the map is reloaded, the location should be retrieved 
+          //so as to mimic GPS movement, who knows, we might be able to make this "real-time"
+          showMapDirections(destination);
+        }
+        /* End */
+
+        function getItems(name, callback) {
+          $.ajax({
+              type: "GET",
+              url: api_url + name + "/",
+              dataType: "json",
+              success: function(items) {
+                callback(items);
+              },
+              error: function() {
+                callback(new Array());
+              }
+          });
+        }
+
+        function getFood(food_id) {
+          if(food_items.length > 0) {
+            var items = $.grep(food_items, function(a) {
+              return a.ID == food_id;
+            });
+            if(items.length > 0) {
+              return items[0];
+            }
+          }
+          return null;
+        }
+
+        function getFoodItemsByRestaurant(resto_id) {
+          var foods = $.grep(food_items, function(a) {
+            return a.restaurant_id == resto_id;
+          });
+          return foods;
+        }
+
+        function getRestaurant(resto_id) {
+          if(restaurants.length > 0) {
+            var items = $.grep(restaurants, function(a) {
+              return a.ID == resto_id;
+            });
+            if(items.length > 0) {
+              return items[0];
+            }
+          }
+          return null;
+        }
+
+        function getThumbnailUrl(thumbnail, size) {
+          var item_thumb = thumbnail.thumbnails;
+          image_url = uploads_url + item_thumb["img_directory"] +  item_thumb["sizes"][size].file;
+
+          return image_url;
+        }
+
+        //Get the first image
+        function getThumbnailByItem(item_id) {
+          var item_images = getThumbnailsByItem(item_id);
+          if(item_images.length > 0) {
+            return item_images[0];  
+          }
+          return null;
+        }
+
+        //Get all images associated with the selected item
+        function getThumbnailsByItem(item_id) {
+          var item_images = $.grep(images, function(el) {
+            return el.parent_id == item_id;
+          });
+
+          return item_images;
+        }
+
+        //Display the dropdown category;
+        //This is a recursive function so chil-categories are properly displayed
+        function paintCategoryDropdown(parent_id, level) {
+          parent_id = parent_id || 0;
+          level = level || 0;
+
+          $(categories).each(function (){
+            if(this.parent == parent_id) {
+              var category = $("#dfl_templates .dfl-li-category").clone();
+              category.attr({
+                "dfl-name": this.name,
+                "dfl-id": this.term_id
+              });
+
+              var hyphen = new Array(level + 1).join("-");
+              category.find("a").html(hyphen + " " + this.name);
+
+              $("#dfl_categories").append(category);
+              paintCategoryDropdown(this.term_id, level + 1);
+            }
+          });
+        }
+
+        function paintFoodItemResults() {
+          $(food_items).each(function(){
+            var food = $("#dfl_templates .dfl-div-results").clone();
+            food.attr({
+              "dfl-name": this.post_title.toLowerCase(),
+              "dfl-id": this.ID
+            });
+
+            var thumbnail = getThumbnailByItem(this.ID);
+            if(thumbnail != null) {
+               image_url = getThumbnailUrl(thumbnail, "thumbnail");
+               food.find(".img-thumbnail").attr("src", image_url);
+            }
+
+            food.find(".list-group-item-heading").html(this.post_title);
+            food.find(".list-group-item-text").html(this.post_content);
+
+            $(this.category_ids).each(function(){
+              food.addClass("cat-" + this);
+            });
+
+            $("#dfl_results_food").append(food);
+          });
+        }
+
+        function paintRestaurantResults() {
+          $(restaurants).each(function(){
+            var resto = $("#dfl_templates .dfl-div-results").clone();
+            resto.attr({
+              "dfl-name": this.post_title.toLowerCase(),
+              "dfl-id": this.ID
+            });
+
+            var thumbnail = getThumbnailByItem(this.ID);
+            if(thumbnail != null) {
+               image_url = getThumbnailUrl(thumbnail, "thumbnail");
+               resto.find(".img-thumbnail").attr("src", image_url);
+            }
+
+            resto.find(".list-group-item-heading").html(this.post_title);
+            resto.find(".list-group-item-text").html(this.post_content);
+
+            $("#dfl_results_resto").append(resto);
+          });
+        }
+
+        function paintItems() {
+          if(food_items != null 
+              && restaurants != null 
+              && images != null 
+              && categories != null) {
+            
+            paintCategoryDropdown();
+            paintFoodItemResults();
+            paintRestaurantResults();
+
+            $("#dfl_loading").fadeOut("slow");
+
+            //remove resize callback as the loading panel will no longer be needed
+            $(window).unbind("resize");
+          }
+        }
+
+        function showFilteredResults() {
+          var keyword = $("#dfl_txt_search").val();
+          keyword = (keyword != undefined) ? keyword.toLowerCase() : "";
+          var keyword_selector = (keyword != "") ?  "[dfl-name*='" + keyword +  "']" : "";
+
+          $(".dfl-div-results").hide();
+          if(selected_category_id != "") {
+            $("#dfl_results_food .cat-" + selected_category_id + keyword_selector).show();
+            $("#dfl_results_resto .dfl-div-results" + keyword_selector).show();
+          } else {
+            $(".dfl-div-results" + keyword_selector).show();
+          }
+        }
+
+        /**
+         * Region
+         * Modal Displays
+         */
+        $(".modal").on('shown.bs.modal', function () {
+          //move the screen to the topmost of the modal 
+          //so to set an impression that it loads a new screen
+          $(".modal").scrollTop(0);
+        });
+
+        function showFoodDetails(food_id) {
+
+          var food = getFood(food_id);
+          if(food != null) {
+            $("#dfl_mod_food .modal-title").html(food.post_title + " Details");
+            $("#dfl_mod_food .dfl-food-title").html(food.post_title);
+            $("#dfl_mod_food .dfl-food-description").html(food.post_content);
+
+            var thumbnails_container = $("#dfl_mod_food .dfl-detail-image-list");
+            thumbnails_container.empty();
+
+            var thumbnails = getThumbnailsByItem(food_id);
+            if(thumbnails.length > 0) {
+              $(thumbnails).each(function(){
+                if(this != null) {
+                  image_url = getThumbnailUrl(this, "thumbnail");
+
+                  var item_image = $("#dfl_templates .dfl-image").clone();
+                  item_image.find("img").attr("src", image_url);
+            
+                  thumbnails_container.append(item_image);
+                }
+              });
+            } else {
+              image_url = "img/image-unavailable.jpg";
+              var item_image = $("#dfl_templates .dfl-image").clone();
+              item_image.find("img").attr("src", image_url);
+            
+              thumbnails_container.append(item_image);
+            }
+            
+            var resto = getRestaurant(food.restaurant_id);
+            var btn_resto = $("#dfl_mod_food .dfl-btn-resto");
+            if(resto != null) {
+              btn_resto.attr({
+                "dfl-name": resto.post_title.toLowerCase(),
+                "dfl-id": resto.ID
+              });
+              btn_resto.html(resto.post_title);
+              btn_resto.parent().show();
+            } else {
+              btn_resto.parent().hide();
+            }
+
+            $("#dfl_mod_food").modal("show");
+          }
+        }
+
+        function showRestaurantDetails(resto_id) {
+          var resto = getRestaurant(resto_id);
+          if(resto != null) {
+            $("#dfl_mod_resto .modal-title").html(resto.post_title + " Details");
+            $("#dfl_mod_resto .dfl-resto-title").html(resto.post_title);
+            $("#dfl_mod_resto .dfl-resto-description").html(resto.post_content);
+
+            var thumbnails_container = $("#dfl_mod_resto .dfl-detail-image-list");
+            thumbnails_container.empty();
+
+            var thumbnails = getThumbnailsByItem(resto_id);
+            if(thumbnails.length > 0) {
+              $(thumbnails).each(function(){
+                if(this != null) {
+                  image_url = getThumbnailUrl(this, "thumbnail");
+
+                  var item_image = $("#dfl_templates .dfl-image").clone();
+                  item_image.find("img").attr("src", image_url);
+            
+                  thumbnails_container.append(item_image);
+                }
+              });
+            } else {
+              image_url = "img/image-unavailable.jpg";
+              var item_image = $("#dfl_templates .dfl-image").clone();
+              item_image.find("img").attr("src", image_url);
+            
+              thumbnails_container.append(item_image);
+            }
+
+            $("#dfl_mod_resto .dfl-btn-food").remove();
+            var foods = getFoodItemsByRestaurant(resto_id);
+            var food_list = $("#dfl_mod_resto .dfl-food-items");
+            if(foods.length > 0) {
+              $(foods).each(function(){
+                var btn_food = $("#dfl_templates .dfl-btn-food").clone();
+                btn_food.attr({
+                  "dfl-name": this.post_title.toLowerCase(),
+                  "dfl-id": this.ID
+                });
+                btn_food.html(this.post_title);
+
+                food_list.append(btn_food);
+              });
+              food_list.show();
+            } else {
+              food_list.hide();
+            }
+
+            var location = resto.location;
+            if(location != "") {
+              var location_segments = location.split("|");
+              var location_place = location_segments[0];
+              var location_coords = location_segments[1];
+              var location_coords_segments = location_coords.split(",");
+              var latitude = location_coords_segments[0];
+              var longitude = location_coords_segments[1];
+
+              reloadMap(latitude, longitude);
+
+              $("#dfl_resto_map").show();
+            } else {
+              $("#dfl_resto_map").hide();
+            }
+            
+            $("#dfl_mod_resto").modal("show");
+          } else {
+            //console.log("Restaurant not found!");
+          }
+        }
+        /* end */
+
+        /**
+         * Region
+         * triggers: Display Modal
+         */
+        $("#dfl_results_food").on("click", ".list-group-item", function(){
+          var food_id = $(this).attr("dfl-id");
+          showFoodDetails(food_id);
+        });
+        $("#dfl_results_resto").on("click", ".list-group-item", function(){
+          var resto_id = $(this).attr("dfl-id");
+          showRestaurantDetails(resto_id);
+        });
+
+        $("#dfl_mod_food").on("click", ".dfl-btn-resto", function(){
+          var resto_id = $(this).attr("dfl-id");
+          showRestaurantDetails(resto_id);
+        });
+        $("#dfl_mod_resto").on("click", ".dfl-btn-food", function(){
+          var food_id = $(this).attr("dfl-id");
+          showFoodDetails(food_id);
+        });
+        /* End */
+
+        /**
+         * Region
+         * event: change in search parameters
+         */
+        $("#dfl_categories").on("click", "li.dfl-li-category", function(){
+          selected_category_id = $(this).attr("dfl-id");
+          $("#dfl_selected_category span").html($(this).attr("dfl-name"));
+
+          showFilteredResults();
+        });
+        $("#dfl_txt_search").change(function(){
+          showFilteredResults();
+        });
+        /* End */
+
+        /**
+         * Region
+         * event: Tab Change (additional)
+         */
+        $("#dfl_a_food").click(function() {
+          showFilteredResults();
+          $("#dfl_selected_category").show();
+        });
+        $("#dfl_a_resto").click(function(){
+          showFilteredResults();
+          $("#dfl_selected_category").hide();
+        });
+        /* End */
+
+        /**
+         * Region
+         * Initialization
+         */
+        function showLoadingPanel() {
+          $("#dfl_loading").css({
+            "height": $(window).height() + "px"
+          });
+          $("#dfl_img_loading").css({
+            "max-height" : ($(window).height() * .9) + "px",
+            "max-width" : ($(window).width() * .9) + "px",
+          })
+        }
+
+        $(window).resize(function() {
+          showLoadingPanel();
+        });
+        showLoadingPanel();
+
+        getItems("categories", function(categs) {
+          categories = categs;
+          paintItems();
+        });
+
+        getItems("food-items", function(foods) {
+          food_items = foods;
+          paintItems();
+        });
+
+        getItems("restaurants", function(restos) {
+          restaurants = restos;
+          paintItems();
+        });
+
+        getItems("images", function(imgs) {
+          images = imgs;
+          paintItems();
+        });
+        /* End Initialization */
+      })
+    </script>
+  </body>
+</html>
